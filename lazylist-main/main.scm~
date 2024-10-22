@@ -1,0 +1,60 @@
+(define gen-list
+  (lambda (start stop)
+    (if (> start stop)
+        '()
+        (cons start (gen-list (+ start 1) stop)))))
+
+(define pair-sum?
+  (lambda (lyst desired)
+    (cond
+      ((null? lyst) #f)
+      ((null? (cdr lyst)) #f)
+      ((= (+ (car lyst) (cadr lyst)) desired) #t)
+      (else (pair-sum? (cdr lyst) desired)))))
+
+(define gen-lazy-list
+  (lambda (start stop)
+    (if (> start stop)
+        '()
+        (cons start (lambda () (gen-lazy-list (+ start 1) stop))))))
+
+(define inf-seq
+  (lambda (first)
+    (cons first (lambda () (inf-seq (+ first 1))))))
+
+(define make-lazy
+  (lambda (lyst)
+    (if (null? lyst)
+        '()
+        (cons (car lyst) (lambda () (make-lazy (cdr lyst)))))))
+
+(define pair-sum-lazy?
+  (lambda (lazy-list desired)
+    (cond
+     ((null? ((cdr lazy-list)))
+	     #f)
+     ((= (+ (car lazy-list) (car ((cdr lazy-list)))) desired)
+	 #t)
+     (else (pair-sum-lazy? ((cdr lazy-list)) desired)))))
+
+(define first-n
+  (lambda (lazy-list n)
+    (cond
+      ((null? lazy-list) '())
+      ((= n 0) '())
+      (else (cons (car lazy-list) (first-n ((cdr lazy-list)) (- n 1)))))))
+
+(define nth
+  (lambda (lazy-list n)
+    (cond
+      ((null? lazy-list) #f)
+      ((<= n 1) (car lazy-list))
+      (else (nth ((cdr lazy-list)) (- n 1))))))
+
+(define filter-multiples
+  (lambda (lazy-list n)
+    (cond
+      ((null? lazy-list) '())
+      ((= (car lazy-list) 0) (filter-multiples ((cdr lazy-list)) n))
+      ((zero? (modulo (car lazy-list) n)) (filter-multiples ((cdr lazy-list)) n))
+      (else (cons (car lazy-list) (lambda () (filter-multiples ((cdr lazy-list)) n)))))))
